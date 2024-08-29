@@ -1,4 +1,29 @@
-import threading
+'''Задача "За честь и отвагу!":
+Создайте класс Knight, наследованный от Thread, объекты которого будут обладать следующими свойствами:
+Атрибут name - имя рыцаря. (str)
+Атрибут power - сила рыцаря. (int)
+А также метод run, в котором рыцарь будет сражаться с врагами:
+При запуске потока должна выводится надпись "<Имя рыцаря>, на нас напали!".
+Рыцарь сражается до тех пор, пока не повергнет всех врагов (у всех потоков их 100).
+В процессе сражения количество врагов уменьшается на power текущего рыцаря.
+По прошествию 1 дня сражения (1 секунды) выводится строка "<Имя рыцаря> сражается <кол-во дней>...,
+осталось <кол-во воинов> воинов."
+После победы над всеми врагами выводится надпись "<Имя рыцаря> одержал победу спустя <кол-во дней> дней(дня)!"
+Как можно заметить нужно сделать задержку в 1 секунду, инструменты для задержки выберите сами.
+
+Пункты задачи:
+Создайте класс Knight с соответствующими описанию свойствами.
+Создайте и запустите 2 потока на основе класса Knight.
+Выведите на экран строку об окончании битв.
+
+Пример результата выполнения программы:
+Алгоритм выполнения кода:
+# Создание класса
+first_knight = Knight('Sir Lancelot', 10)
+second_knight = Knight("Sir Galahad", 20)
+# Запуск потоков и остановка текущего
+# Вывод строки об окончании сражения'''
+
 import time
 from threading import Thread
 
@@ -11,25 +36,27 @@ class Knight(Thread):
         self.power = power
 
     def run(self):
-        day_war = 10
         soldier = 100
         print(f'{self.name}, на нас напали!')
         time.sleep(1)
-        for j in range(day_war):
+        for num_day, num_war in enumerate(range(soldier, 0, - self.power)):
+            if soldier < 0:
+                break
             time.sleep(1)
-            print(f'{self.name} сражается {j + 1} день(дня)..., осталось {soldier - self.power} воинов')
+            print(f'{self.name} сражается {num_day + 1} день(дня)..., осталось {num_war - self.power} воинов')
         time.sleep(1)
-        print(f'{self.name} одержал победу спустя {day_war} дней(дня)!')
+        print(f'{self.name} одержал победу спустя {soldier // self.power} дней(дня)!')
 
 
-first_knight = Knight('Sir Lancelot', 10)
-second_knight = Knight('Sir Galahad', 20)
+if __name__ == '__main__':
 
-first_knight.start()
-first_knight.join()
-second_knight.start()
-second_knight.join()
+    first_knight = Knight('Sir Lancelot', 10)
+    second_knight = Knight('Sir Galahad', 20)
 
+    first_knight.start()  # В таком порядке, мне показалось более упорядочено выводится на консоль
+    first_knight.join()   # когда сражается сначала Lancelot, а потом Galahad (нет "каши")
 
-print(f'Все битвы закончились!')
+    second_knight.start()
+    second_knight.join()
 
+    print(f'Все битвы закончились!')
