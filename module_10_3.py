@@ -43,9 +43,9 @@ import random
 
 class Bank:
 
-    def __init__(self):
+    def __init__(self, start=0):
         super().__init__()
-        self.balance = 0
+        self.balance = start
         self.lock = threading.Lock()
 
     def deposit(self):
