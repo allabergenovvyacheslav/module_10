@@ -25,7 +25,7 @@ second_knight = Knight("Sir Galahad", 20)
 # Вывод строки об окончании сражения'''
 
 import time
-from threading import Thread
+from threading import Thread, Lock
 
 
 class Knight(Thread):
@@ -40,18 +40,19 @@ class Knight(Thread):
         print(f'{self.name}, на нас напали!')
         time.sleep(1)
         for num_day, num_war in enumerate(range(soldier, 0, - self.power)):
-            if soldier < 0:
-                break
             time.sleep(1)
-            print(f'{self.name} сражается {num_day + 1} день(дня)..., осталось {num_war - self.power} воинов')
+            if (num_war - self.power) >= 0:
+                print(f'{self.name} сражается {num_day + 1} день(дня)..., осталось {num_war - self.power} воинов')
+            else:
+                print(f'{self.name} сражается {num_day + 1} день(дня)..., осталось {0} воинов')
         time.sleep(1)
         print(f'{self.name} одержал победу спустя {soldier // self.power} дней(дня)!')
 
 
 if __name__ == '__main__':
 
-    first_knight = Knight('Sir Lancelot', 10)
-    second_knight = Knight('Sir Galahad', 20)
+    first_knight = Knight('Sir Lancelot', 35)
+    second_knight = Knight('Sir Galahad', 45)
 
     first_knight.start()  # В таком порядке, мне показалось более упорядочено выводится на консоль
     first_knight.join()   # когда сражается сначала Lancelot, а потом Galahad (нет "каши")
