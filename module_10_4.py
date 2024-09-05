@@ -1,26 +1,3 @@
-# def producer(queue):
-#     while True:
-#         message = 'ping'
-#         queue.put(message)
-#         sleep(random.randint(2, 6))
-#
-#
-# def worker(queue):
-#     while True:
-#         message = queue.get()
-#         print(message)
-#
-#
-# q = queue.Queue()
-# t1 = Thread(target=producer, args=(q,))
-# t2 = Thread(target=worker, args=(q,))
-#
-# t1.start()
-# t2.start()
-#
-# t1.join()
-# t2.join()
-
 import queue
 import random
 from threading import Thread
@@ -62,18 +39,18 @@ class Guest(Thread):
 
 class Cafe:
 
-    def __init__(self, *tables):        
+    def __init__(self, *tables):
         self.tables = tables
         self.queue = queue.Queue()
 
-    #Метод guest_arrival(self, *guests):
+    # Метод guest_arrival(self, *guests):
     # Должен принимать неограниченное кол-во гостей (объектов класса Guest).
     # Далее, если есть свободный стол, то садить гостя за стол (назначать столу guest), запускать поток гостя и
     # выводить на экран строку "<имя гостя> сел(-а) за стол номер <номер стола>".
     # Если же свободных столов для посадки не осталось, то помещать гостя в очередь queue и выводить сообщение
     # "<имя гостя> в очереди".
 
-    def guest_arrival(self, *guests: Guest):
+    def guest_arrival(self, *guests):
         for guest in guests:
             for table in self.tables:
                 if table.guest is None:
@@ -81,9 +58,9 @@ class Cafe:
                     guest.start()
                     print(f'{guest.name} сел(-а) за стол номер {table.number}')
                     break
-                else:
-                    self.queue.put(guest)
-                    print(f'{guest.name} в очереди')
+            else:
+                self.queue.put(guest)
+                print(f'{guest.name} в очереди')
 
     # Метод discuss_guests(self):
     # Этот метод имитирует процесс обслуживания гостей.
@@ -97,20 +74,26 @@ class Cafe:
     # Далее запустить поток этого гостя (start)
 
     def discuss_guests(self):
-        while not self.queue.empty() or any(table.guest for table in self.tables):
+        while not self.queue.empty() or any(table.guest is not None for table in self.tables):
             for table in self.tables:
-                if table.guest and not table.guest.is_alive():
+                if table.guest is not None and not table.guest.is_alive():
                     print(f'{table.guest.name} за столом {table.number} покушал(-а) и ушёл(ушла)')
                     table.guest = None
                     print(f'Стол номер {table.number} свободен')
-
-                    if not self.queue.empty():
-                        table.guest = self.queue.get()
-                        table.guest.start()
-                        print(f'{table.guest.name} вышел(-ла) из очереди и сел(-а) за стол номер {table.number}')
-
-
+                if not self.queue.empty() and table.guest is None:
+                    guest = self.queue.get()
+                    table.guest = guest
+                    guest.start()
+                    print(f'{guest.name} вышел(-ла) из очереди и сел(-а) за стол номер {table.number}')
+    # Примечания:
+    # Для проверки значения на None используйте оператор is (table.guest is None).
+    # Для добавления в очередь используйте метод put, для взятия - get.
+    # Для проверки пустоты очереди используйте метод empty.
+    # Для проверки выполнения потока в текущий момент используйте метод is_alive.
+    
+    
 if __name__ == '__main__':
+    
     # Создание столов
     tables = [Table(number) for number in range(1, 6)]
     # Имена гостей
@@ -126,17 +109,3 @@ if __name__ == '__main__':
     cafe.guest_arrival(*guests)
     # Обслуживание гостей
     cafe.discuss_guests()
-
-# Примечания:
-# Для проверки значения на None используйте оператор is (table.guest is None).
-# Для добавления в очередь используйте метод put, для взятия - get.
-# Для проверки пустоты очереди используйте метод empty.
-# Для проверки выполнения потока в текущий момент используйте метод is_alive.
-
-
-
-
-
-
-
-
